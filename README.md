@@ -53,12 +53,14 @@ The left column carries the instructions. The sticky stage on the right shows th
   </tr>
 </table>
 
-**Responsive.** On phones the diagram is recomposed vertically and the lower pane switches between Chat and the node configuration.
+**Responsive.** On phones the diagram is recomposed vertically and the lower pane switches between Chat and the node configuration. When the Gmail form is open, the small diagram collapses so the whole form fits.
 
 <p>
   <img src="docs/screenshots/mobile-01-hero.png" alt="Mobile hero" width="240">
   &nbsp;
   <img src="docs/screenshots/mobile-02-sheets-tool.png" alt="Mobile Sheets tool step" width="240">
+  &nbsp;
+  <img src="docs/screenshots/mobile-03-email.png" alt="Mobile Gmail step showing the revised draft" width="240">
 </p>
 
 ## Quick start

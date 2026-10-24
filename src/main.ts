@@ -135,6 +135,7 @@ function applyStep(i: number) {
   $('#cb-phase').textContent = s.chapter === 'setup' ? 'Setup' : `Phase ${s.chapter.slice(-1).padStart(2, '0')}`;
   $('#story-wf').classList.toggle('is-empty', !s.nodes.length);
   $('#stage').dataset.mode = s.mode;
+  $('#stage').dataset.panel = s.panel;
   $('#cb-name').textContent = PANEL_INTRO_NAME(s);
   mobileTabs.panel.textContent = PANEL_NAMES[s.panel];
 

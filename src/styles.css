@@ -319,7 +319,7 @@ a { color: inherit; }
   .stage {
     top: var(--top); height: auto; min-height: 0; max-height: none; margin: 0 -12px; padding: 8px 12px 8px; align-self: stretch;
     grid-template-rows: auto auto auto; gap: 8px; z-index: 5;
-    background: linear-gradient(var(--bg) 85%, rgba(10, 11, 13, 0));
+    background: var(--bg); box-shadow: 0 10px 12px 2px rgba(10, 11, 13, 0.96);
   }
   .canvas-bar { height: 34px; }
   .story-wf { height: min(56vw, 230px); flex: none; }
@@ -385,3 +385,18 @@ a { color: inherit; }
   .step { padding: 4vh 0 18vh; }
 }
 .pill:empty { display: none; }
+
+/* Phones: the Gmail form needs more room than the shared lower pane has. While it is open on the
+   Node tab, the diagram collapses and the form takes its space. The stage keeps the same total
+   height, so the narrative below never moves. */
+@media (max-width: 900px) {
+  .stage[data-tab='panel'][data-panel='email'] .story-wf { display: none; }
+  .stage[data-tab='panel'][data-panel='email'] .lower { height: calc(max(22vh, 150px) + min(46vw, 180px)); }
+  .mf { padding: 8px 14px; }
+  .mrow .mf { padding: 7px 14px; }
+  .mbody { padding: 10px 14px; }
+  .mfoot { padding: 8px 14px; }
+  .stepper { padding: 10px 14px; }
+  .mrow { grid-template-columns: 1.5fr 1fr 1fr; }
+  .mrow .mf b { white-space: normal; line-height: 1.3; }
+}
