@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Workflow · Build an AI agent in n8n</title>
+  <meta name="description" content="A scroll-driven explainer: build an n8n AI agent with Gemini, memory, Google Sheets and Gmail with explicit approval." />
+  <meta name="theme-color" content="#0a0b0d" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Agent Workflow, back to top">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>Agent&nbsp;Workflow</span>
+    </a>
+    <nav aria-label="Chapters">
+      <ol class="chapters" id="chapters"></ol>
+    </nav>
+    <div class="progress" aria-hidden="true"><i id="progress"></i></div>
+  </header>
+
+  <main id="main">
+    <!-- 1 · Hero -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="dot"></span>Build guide · n8n · ~30 min</p>
+        <h1 id="hero-title">Build an AI agent in n8n that <em>gets things done.</em></h1>
+        <p class="lede">Step by step: wire a Chat Trigger, an AI Agent and Gemini, then add memory, a Google Sheets tool and a Gmail tool that waits for your approval. Every node, every setting, every test.</p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#setup">Start building
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+          <a class="btn ghost" href="#intro">See the architecture</a>
+        </div>
+      </div>
+      <figure class="hero-stage">
+        <div class="editor-chrome">
+          <div class="ec-bar"><span class="ec-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="ec-title">My workflow</span><span class="ec-run"><i></i>Running</span></div>
+          <div class="hero-wf"><div id="hero-wf" class="ratio hero-ratio"></div></div>
+          <div class="hero-chat" aria-hidden="true">
+            <div class="hc-msg hc-user">Hi!</div>
+            <div class="hc-msg hc-agent"><span class="hc-typing"><i></i><i></i><i></i></span><span class="hc-text">Hey! How can I help you today?</span></div>
+          </div>
+        </div>
+        <figcaption>What you’ll have after Phase 01: Chat Trigger → AI Agent → Gemini.</figcaption>
+      </figure>
+    </section>
+
+    <!-- 2 · Intro -->
+    <section class="intro chapter-anchor" id="intro" data-chapter="intro" aria-labelledby="intro-title">
+      <div class="intro-head">
+        <p class="eyebrow">Overview · What you’ll build</p>
+        <h2 id="intro-title">Six nodes. Four phases. <em>One mental model.</em></h2>
+        <p class="lede">In n8n, an agent is a normal workflow. A trigger node starts the run, and the AI Agent node orchestrates it, with sub-nodes plugged into its slots: a chat model, memory, and tools. Here’s how each kind of node maps to that.</p>
+      </div>
+      <ol class="roles">
+        <li><span class="r-num">Trigger node</span><h3>Chat Trigger</h3><p>Starts one execution per message. It outputs <code>chatInput</code> and <code>sessionId</code>.</p></li>
+        <li><span class="r-num">Root node</span><h3>AI Agent</h3><p>Builds the prompt, calls the model, runs any tool calls the model asks for, and loops until it can answer.</p></li>
+        <li><span class="r-num">Sub-nodes</span><h3>Model + Memory</h3><p>Gemini generates text and tool calls. Simple Memory supplies recent turns for the session.</p></li>
+        <li><span class="r-num">Tool sub-nodes</span><h3>Sheets + Gmail</h3><p>The model picks a tool by its name and description. n8n runs it with the stored OAuth credential.</p></li>
+      </ol>
+      <div class="legend" aria-label="Diagram legend">
+        <span><svg width="36" height="8" aria-hidden="true"><line x1="0" y1="4" x2="36" y2="4" class="lg-main"/></svg>Main flow: data passing between steps</span>
+        <span><svg width="36" height="8" aria-hidden="true"><line x1="0" y1="4" x2="36" y2="4" class="lg-sub"/></svg>Sub-node: a capability plugged into the agent</span>
+        <span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" class="lg-pkt"/></svg>A message or tool call in transit</span>
+      </div>
+    </section>
+
+    <!-- 3–6 · Pinned story -->
+    <section class="story" aria-label="Building the agent, phase by phase">
+      <div class="narrative" id="narrative"></div>
+      <div class="stage" id="stage">
+        <div class="canvas card">
+          <div class="canvas-bar">
+            <span class="cb-title"><span class="cb-phase" id="cb-phase">Phase 01</span><span id="cb-name">Give it a brain</span></span>
+            <span class="cb-session" id="cb-session"></span>
+          </div>
+          <div id="story-wf" class="story-wf"></div>
+        </div>
+        <div class="mobile-tabs" role="tablist" aria-label="Stage view">
+          <button role="tab" id="tab-chat" aria-selected="true" aria-controls="chat-win">Chat</button>
+          <button role="tab" id="tab-panel" aria-selected="false" aria-controls="panel">Node</button>
+        </div>
+        <div class="lower">
+          <div class="chat card" id="chat-win" role="tabpanel" aria-labelledby="tab-chat">
+            <header class="win-bar"><span class="win-ico" style="--tint:#9aa3ad"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>Chat</span><span class="pill" id="chat-session">session 1</span></header>
+            <div class="chat-log" id="chat-log" role="log" aria-label="Simulated conversation"></div>
+            <div class="chat-input" aria-hidden="true"><span>Type a message…</span><i></i></div>
+          </div>
+          <div class="panel card" id="panel" role="tabpanel" aria-labelledby="tab-panel"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · Final -->
+    <section class="final chapter-anchor" id="final" data-chapter="final" aria-labelledby="final-title">
+      <div class="final-head">
+        <p class="eyebrow">05 · Reference</p>
+        <h2 id="final-title">The finished workflow, <em>node by node.</em></h2>
+        <p class="lede">Use this as a checklist when you compare it with your own canvas.</p>
+      </div>
+      <div class="final-canvas card"><div id="final-wf" class="ratio final-ratio"></div></div>
+      <ul class="final-key">
+        <li><b>Chat Trigger</b><span>On new chat event · defaults</span></li>
+        <li><b>AI Agent</b><span>Prompt: Define below → <code>{{ $json.chatInput }}</code><br>Option: System Message</span></li>
+        <li><b>Google Gemini Chat Model</b><span>Credential: Gemini API key<br>Model: gemini 3.1 flash lite · Temperature 0.2</span></li>
+        <li><b>Simple Memory</b><span>Defaults · session from Chat Trigger</span></li>
+        <li><b>get_board_members</b><span>Google Sheets tool · OAuth<br>Description: “list the board members”<br>Doc: Members List · Sheet1</span></li>
+        <li><b>send_board_email</b><span>Gmail tool · OAuth · To/Subject/Message ✦ model-defined<br>Sender Name: Executive Agent · Attribution off<br>Description: only after explicit approval</span></li>
+      </ul>
+      <ol class="recap">
+        <li><a href="#phase-1"><span>01</span>Build the core agent.</a></li>
+        <li><a href="#phase-2"><span>02</span>Add memory.</a></li>
+        <li><a href="#phase-3"><span>03</span>Connect a data tool.</a></li>
+        <li><a href="#phase-4"><span>04</span>Add a gated action.</a></li>
+      </ol>
+    </section>
+
+    <!-- 8 · Takeaways -->
+    <section class="takeaways" aria-labelledby="take-title">
+      <h2 id="take-title" class="sr-only">Key takeaways</h2>
+      <dl>
+        <div><dt>Names and descriptions are your API.</dt><dd>The model chooses tools only by their node name and description. Make them specific and unambiguous.</dd></div>
+        <div><dt>Memory is a window, not a mind.</dt><dd>Simple Memory replays recent messages per session. A new session starts blank.</dd></div>
+        <div><dt>Prompts guide. They don’t guarantee.</dt><dd>The approval rule lives in the system message and tool description. For guaranteed sign-off, add a deterministic approval step.</dd></div>
+      </dl>
+    </section>
+
+    <section class="closing" aria-labelledby="close-title">
+      <h2 id="close-title">Now build yours.</h2>
+      <p>Open n8n, add a Chat Trigger and work through the phases. If something doesn’t behave, open <b>Executions</b> and inspect each node’s input and output.</p>
+      <a class="btn primary" href="#setup">Back to step 1
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
+      </a>
+      <p class="fine">Every conversation, record and email on this page is simulated. No API calls are made and no email is sent.</p>
+    </section>
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
